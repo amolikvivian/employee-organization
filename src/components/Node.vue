@@ -21,17 +21,19 @@
       </div>
       <hr class="w-4" :class="checkPos(item)" />
       <div
-        class="px-1 py-2 border-l-4 w-80 shadow-md flex items-center bg-gray-100 justify-between card shadow-xl"
+        class="px-1 py-2 border-l-4 w-80 shadow-md flex items-center bg-gray-100 justify-between shadow-xl"
         @mouseenter="showOptions = true"
         @mouseleave="showOptions = false"
         :class="checkPos(item)"
+        @click="expand()"
       >
         <div class="flex items-center">
           <Icon name="user" />
           <div class="flex flex-col px-2 text-sm">
             <span>{{ item.name }}</span>
             <span class="tracking-wide text-gray-500 text-xs"
-              >{{ item.position }} {{ item.isLead || item.isMember ? '- ' + item.teamId : "" }}</span
+              >{{ item.position }}
+              {{ item.isLead || item.isMember ? "- " + item.teamId : "" }}</span
             >
           </div>
         </div>
@@ -51,7 +53,7 @@
       <div
         v-if="item.isLead || item.isHead"
         class="cursor-pointer ml-2 text-sm flex items-center text-gray-200 border border-white px-1 rounded-full py-1"
-        :title="addMessage"
+        :title="getTitle"
         @click="toggleAddModal(item)"
       >
         <Icon name="plus" />
@@ -67,16 +69,11 @@
       <Node v-for="child in item.children" :item="child" :key="child.id" />
     </div>
     <Modal
-      v-if="showAddMemberModal"
-      :type="member"
+      v-if="showModal"
+      :type="getType"
       :data="item"
       @addMember="addMember"
-    />
-    <Modal
-      v-if="showAddTeamModal"
-      :type="team"
-      :data="item"
-      @addTeam="addTeam"
+      @cancel="cancel"
     />
   </div>
 </template>
@@ -95,10 +92,11 @@ export default {
       showOptions: false,
       showAddMemberModal: false,
       showAddTeamModal: false,
+      showModal: false,
     };
   },
   computed: {
-    addMessage() {
+    getTitle() {
       let msg;
       if (this.item.isLead) {
         msg = "Add Member";
@@ -107,6 +105,16 @@ export default {
         msg = "Add Team";
       }
       return msg;
+    },
+    getType() {
+      let type;
+      if (this.item.isLead) {
+        type = "member";
+      }
+      if (this.item.isHead) {
+        type = "team";
+      }
+      return type;
     },
   },
 
@@ -138,21 +146,22 @@ export default {
         this.$store.dispatch("deleteEmployee", item);
       }
     },
-    toggleAddModal(item) {
-      if (item.isHead) this.showAddTeamModal = !this.showAddTeamModal;
-      if (item.isLead) this.showAddMemberModal = !this.showAddMemberModal;
+    toggleAddModal() {
+      this.showModal = !this.showModal;
     },
     addMember(ob) {
       this.$store.state.employees.push(ob);
       this.showChildren = true;
-      this.showAddMemberModal = false;
+      this.cancel();
+    },
+
+    cancel() {
+      this.showModal = false;
     },
   },
 };
 </script>
 
 <style>
-.card {
-  transition: all 0.1s ease-in-out;
-}
+
 </style>

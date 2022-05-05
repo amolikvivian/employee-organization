@@ -74,7 +74,7 @@ export default {
 
 <style>
 .header-font {
-  border-left: 2px solid var(--yellow-accent);
+  border-left: 3px solid var(--yellow-accent);
 }
 .save-btn {
   border: 2px solid var(--yellow-accent);
