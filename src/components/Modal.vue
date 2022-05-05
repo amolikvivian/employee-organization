@@ -65,6 +65,7 @@
 
 <script>
 import { capitalize } from "@/helper.js";
+import { v4 as uuidv4 } from 'uuid';
 export default {
   props: {
     type: String,
@@ -82,7 +83,7 @@ export default {
   methods: {
     addMember() {
       let ob = {
-        id: "22e12",
+        id: uuidv4(),
         position: "Team Member",
         name: this.name,
         teamId: this.data.teamId,
@@ -102,7 +103,7 @@ export default {
         alert("Cannot have same team names");
       } else {
         let ob = {
-          id: "12daa",
+          id: uuidv4(),
           position: "Team Lead",
           name: this.name,
           teamId: this.teamName,
