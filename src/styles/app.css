@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --blue-darkest: #24305e;
+  --blue-dark: #374785;
+  --blue-light: #a8d0e6;
+  --red-accent: #f76c6c;
+  --yellow-accent: #e8c100;
+}
+
+body {
+  overflow-x: hidden;
+}
