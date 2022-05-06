@@ -42,8 +42,16 @@
             <Icon name="edit" />
           </div>
           <div
+            v-if="item.isMember"
+            @click="switchTeam()"
+            class="pl-2 cursor-pointer"
+            title="Switch Teams"
+          >
+            <Icon name="switch" />
+          </div>
+          <div
             @click="deleteItem(item)"
-            class="px-2 ml-1 cursor-pointer"
+            class="px-2 cursor-pointer"
             title="Delete Employee"
           >
             <Icon name="delete" />
@@ -57,6 +65,23 @@
         @click="toggleAddModal(item)"
       >
         <Icon name="plus" />
+      </div>
+      <div v-if="showSwitch" class="flex items-center justify-between ml-5">
+        <select
+          v-model="newTeamId"
+          class="w-20 px-2 py-1"
+          @change="toggleSwitchOptions()"
+        >
+          <option v-for="team in teamIds" :key="team" :value="team">
+            {{ team }}
+          </option>
+        </select>
+        <div class="ml-4 mt-2" v-if="showSwitchOptions">
+          <button @click="confirmSwitch" class=""><Icon name="tick" /></button>
+          <button @click="cancelSwitch" class="ml-2">
+            <Icon name="cross" />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -93,6 +118,9 @@ export default {
       showAddMemberModal: false,
       showAddTeamModal: false,
       showModal: false,
+      showSwitch: false,
+      showSwitchOptions: false,
+      newTeamId: this.item.teamId,
     };
   },
   computed: {
@@ -116,11 +144,21 @@ export default {
       }
       return type;
     },
+    teamIds() {
+      let arr = this.$store.getters.teamByDept(this.item.deptId).map((team) => {
+        return team.teamId;
+      });
+      arr = arr.filter((ele) => ele != undefined);
+      return [...new Set(arr)];
+    },
   },
 
   methods: {
     expand() {
       this.showChildren = !this.showChildren;
+    },
+    switchTeam() {
+      this.showSwitch = !this.showSwitch;
     },
     toEdit() {
       this.$router.push({ path: `/edit/${this.item.id}` });
@@ -150,11 +188,31 @@ export default {
       this.showModal = !this.showModal;
     },
     addMember(ob) {
-      this.$store.state.employees.push(ob);
+      this.$store.dispatch("addEmployee", ob);
       this.showChildren = true;
       this.cancel();
     },
-
+    toggleSwitchOptions() {
+      if (this.newTeamId != this.item.teamId) {
+        this.showSwitchOptions = true;
+      } else {
+        this.showSwitchOptions = false;
+      }
+    },
+    confirmSwitch() {
+      const currentItem = {
+        ...this.item,
+      };
+      const newItem = {
+        ...this.item,
+        teamId: this.newTeamId,
+      };
+      this.deleteItem(currentItem);
+      this.addMember(newItem);
+    },
+    cancelSwitch() {
+      this.showSwitchOptions = false;
+    },
     cancel() {
       this.showModal = false;
     },
@@ -162,6 +220,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

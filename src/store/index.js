@@ -133,10 +133,35 @@ export default createStore({
         email: "john@smith.com",
         isMember: true,
       },
+      {
+        id: 12,
+        position: "Team Lead",
+        name: "John Lead",
+        teamId: "T004",
+        dept: "Engineering",
+        deptId: "00ER",
+        number: 1234567890,
+        email: "john@smith.com",
+        isLead: true,
+      },
+      {
+        id: 13,
+        position: "Team Member",
+        name: "John Member",
+        teamId: "T004",
+        dept: "Engineering",
+        deptId: "00ER",
+        number: 1234567890,
+        email: "john@smith.com",
+        isMember: true,
+      },
     ],
   },
 
   mutations: {
+    ADD(state, data) {
+      state.employees.push(data)
+    },
     DELETE(state, id) {
       state.employees = state.employees.filter((emp) => {
         return emp.id !== id;
@@ -144,15 +169,21 @@ export default createStore({
     },
     UPDATE(state, data) {
       let idx = state.employees.findIndex((emp) => emp.id == data.id);
-      state.employees[idx] = data
+      state.employees[idx] = data;
     },
   },
   actions: {
+    addEmployee({commit}, payload) {
+      commit("ADD", payload)
+    },
     deleteEmployee({ commit }, payload) {
       commit("DELETE", payload.id);
     },
     updateEmployee({ commit }, payload) {
       commit("UPDATE", payload);
+    },
+    switchTeam({ commit }, payload) {
+      commit("SWITCH_TEAM", payload);
     },
   },
   modules: {},
@@ -167,6 +198,11 @@ export default createStore({
     },
     employees(state) {
       return state.employees;
+    },
+    teamByDept: (state) => (deptId) => {
+      return state.employees.filter((emp) => {
+        return emp.deptId == deptId;
+      });
     },
   },
   plugins: [new VuexPersistence().plugin],
